@@ -15,7 +15,8 @@ export default function Historial() {
   if (!datos) return <main className="pantalla" />;
 
   const fechas = [...datos.comidas.keys()].sort().reverse();
-  const promedio = promedio7(datos.comidas, fechaLocal());
+  const hoy = fechaLocal();
+  const promedio = promedio7(datos.comidas, hoy);
 
   return (
     <main className="pantalla">
@@ -61,9 +62,14 @@ export default function Historial() {
                       </span>
                     </span>
                     <span className="num">{entero(t.kcal)} kcal</span>
-                    <span className={cumplio ? 'marca si' : 'marca no'}>
-                      {cumplio ? 'Cumplió' : 'Se pasó'}
-                    </span>
+                    {/* Hoy todavía puede cambiar: solo se marca si ya se pasó. */}
+                    {fecha === hoy && cumplio ? (
+                      <span className="marca">En curso</span>
+                    ) : (
+                      <span className={cumplio ? 'marca si' : 'marca no'}>
+                        {cumplio ? 'Cumplió' : 'Se pasó'}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

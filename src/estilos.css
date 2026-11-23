@@ -115,6 +115,7 @@ input[type='checkbox'] { width: auto; min-height: 0; margin: 0 8px 0 0; }
 .mini { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: var(--linea); flex: none; }
 .foto-grande { width: 100%; max-height: 220px; object-fit: cover; border-radius: 14px; margin-bottom: 12px; }
 .marca { font-size: 0.8rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.marca { background: var(--linea); color: var(--suave); }
 .marca.si { background: var(--verde-claro); color: var(--verde); }
 .marca.no { background: var(--rojo-claro); color: var(--rojo); }
 

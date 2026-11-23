@@ -81,3 +81,11 @@ test('el detalle de un día lista sus comidas y deja agregar otra en esa fecha',
   expect(await screen.findByRole('heading', { name: 'Nueva comida' })).toBeInTheDocument();
   expect(screen.getByText(etiquetaFecha(hace(3)))).toBeInTheDocument();
 });
+
+test('el día de hoy aparece como en curso, no como cumplido', async () => {
+  await con(hoy, 500);
+  abrir('/historial');
+  await screen.findByText(new RegExp(etiquetaFecha(hoy)));
+  expect(within(filaDe(hoy)).getByText('En curso')).toBeInTheDocument();
+  expect(within(filaDe(hoy)).queryByText('Cumplió')).not.toBeInTheDocument();
+});
