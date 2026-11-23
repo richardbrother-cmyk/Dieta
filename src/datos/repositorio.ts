@@ -70,3 +70,7 @@ export async function borrarTodo(): Promise<void> {
   localStorage.removeItem('dieta.ultimoRespaldo');
   avisarCambioDeAjustes();
 }
+
+export async function metasPorFecha(): Promise<Map<string, Dia>> {
+  return new Map((await db.dias.toArray()).map((d) => [d.fecha, d]));
+}
