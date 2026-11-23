@@ -9,3 +9,7 @@ import { afterEach } from 'vitest';
 Object.assign(globalThis, { Blob: BlobNativo, File: FileNativo });
 
 afterEach(() => cleanup());
+
+// Las URL de objetos del entorno de pruebas no aceptan el Blob de Node; basta una fija.
+URL.createObjectURL = () => 'blob:prueba';
+URL.revokeObjectURL = () => {};
