@@ -1,4 +1,7 @@
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { configuracionCompleta, useAjustes } from './datos/ajustes';
+import { pedirPersistencia } from './datos/respaldo';
 import Hoy from './pantallas/Hoy';
 import Revision from './pantallas/Revision';
 import Historial from './pantallas/Historial';
@@ -14,6 +17,18 @@ const PESTANAS = [
 ];
 
 export default function App() {
+  const [ajustes] = useAjustes();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    void pedirPersistencia();
+  }, []);
+
+  // Primer uso: sin perfil ni clave no hay nada que hacer en las otras pantallas.
+  if (!configuracionCompleta(ajustes) && pathname !== '/ajustes') {
+    return <Navigate to="/ajustes" replace />;
+  }
+
   return (
     <div className="app">
       <Routes>
