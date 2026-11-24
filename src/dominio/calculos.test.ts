@@ -1,5 +1,5 @@
 import {
-  cumplioMeta, escalarAlimento, limpiarNumero, mediaMovil7, promedio7, totalesDe, totalesDelDia,
+  cumplioMeta, escalarAlimento, limpiarEntero, limpiarNumero, mediaMovil7, promedio7, totalesDe, totalesDelDia,
 } from './calculos';
 import type { Alimento, Comida } from './tipos';
 
@@ -60,4 +60,12 @@ test('mediaMovil7 promedia hasta los 7 registros anteriores inclusive', () => {
 test('mediaMovil7 usa como máximo 7 registros', () => {
   const ps = Array.from({ length: 8 }, (_, i) => ({ fecha: `2026-11-0${i + 1}`, kg: i === 0 ? 100 : 70 }));
   expect(mediaMovil7(ps)[7].media).toBe(70);
+});
+
+test('limpiarEntero lee el punto y la coma como separadores de miles', () => {
+  expect(limpiarEntero('1.800')).toBe(1800);
+  expect(limpiarEntero('1,800')).toBe(1800);
+  expect(limpiarEntero(' 2150 ')).toBe(2150);
+  expect(limpiarEntero('')).toBe(0);
+  expect(limpiarEntero('abc')).toBe(0);
 });

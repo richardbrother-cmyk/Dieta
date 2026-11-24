@@ -231,3 +231,18 @@ test('sin datos de navegación vuelve a Hoy', async () => {
   abrir('/revision');
   expect(await screen.findByText('0 / 1.900 kcal')).toBeInTheDocument();
 });
+
+test('en la revisión no hay pestañas que saquen de la pantalla por accidente', async () => {
+  conFoto();
+  await screen.findByDisplayValue('Arroz blanco');
+  expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+});
+
+test('tras corregir la clave se vuelve a la foto y se analiza de nuevo', async () => {
+  const u = userEvent.setup();
+  analizarFoto.mockRejectedValueOnce(new ErrorAnalisis('clave_invalida'));
+  conFoto();
+  await u.click(await screen.findByRole('link', { name: 'Ir a Ajustes' }));
+  await u.click(await screen.findByRole('button', { name: 'Volver a la foto' }));
+  expect(await screen.findByDisplayValue('Arroz blanco')).toBeInTheDocument();
+});

@@ -1,8 +1,9 @@
 import { useState, type ChangeEvent } from 'react';
-import { configuracionCompleta, useAjustes } from '../datos/ajustes';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { configuracionCompleta, leerAjustes, useAjustes } from '../datos/ajustes';
 import { borrarTodo } from '../datos/repositorio';
 import { compartirRespaldo, importar } from '../datos/respaldo';
-import { limpiarNumero } from '../dominio/calculos';
+import { limpiarEntero, limpiarNumero } from '../dominio/calculos';
 import { entero } from '../dominio/formato';
 import { bajoElPiso, PISO_KCAL } from '../dominio/metas';
 import type { Actividad, Ajustes as TipoAjustes, Perfil, Sexo } from '../dominio/tipos';
@@ -37,7 +38,7 @@ function desdeAjustes(a: TipoAjustes): Formulario {
 }
 
 function perfilDe(f: Formulario): Perfil | null {
-  const edad = limpiarNumero(f.edad);
+  const edad = limpiarEntero(f.edad);
   const estaturaCm = limpiarNumero(f.estatura);
   const pesoKg = limpiarNumero(f.peso);
   if (!f.sexo || !f.actividad || !edad || !estaturaCm || !pesoKg) return null;
@@ -52,6 +53,9 @@ export default function Ajustes() {
   const [avisoClave, setAvisoClave] = useState<Aviso>(null);
   const [avisoDatos, setAvisoDatos] = useState<Aviso>(null);
   const [probando, setProbando] = useState(false);
+  const navegar = useNavigate();
+  /** Se llegó aquí desde una foto que no se pudo analizar por la clave. */
+  const hayFotoEsperando = !!(useLocation().state as { volverAFoto?: boolean } | null)?.volverAFoto;
 
   function cambiar(cambio: Partial<Formulario>) {
     const nuevo = { ...f, ...cambio };
@@ -60,8 +64,8 @@ export default function Ajustes() {
       // Un perfil a medio editar no borra el que ya estaba guardado.
       perfil: perfilDe(nuevo) ?? ajustes.perfil,
       metaManual: nuevo.metaManual,
-      metaKcal: nuevo.metaManual ? limpiarNumero(nuevo.metaKcal) : ajustes.metaKcal,
-      metaProteina: nuevo.metaManual ? limpiarNumero(nuevo.metaProteina) : ajustes.metaProteina,
+      metaKcal: nuevo.metaManual ? limpiarEntero(nuevo.metaKcal) : ajustes.metaKcal,
+      metaProteina: nuevo.metaManual ? limpiarEntero(nuevo.metaProteina) : ajustes.metaProteina,
       apiKey: nuevo.apiKey.trim(),
     });
   }
@@ -109,6 +113,8 @@ export default function Ajustes() {
     if (!window.confirm('Importar reemplaza todos los datos actuales. ¿Continuar?')) return;
     try {
       await importar(JSON.parse(await archivo.text()));
+      // El formulario debe reflejar lo importado; si no, el siguiente cambio lo pisaría.
+      setF(desdeAjustes(leerAjustes()));
       setAvisoDatos({ tipo: 'ok', texto: 'Datos importados' });
     } catch {
       setAvisoDatos({ tipo: 'error', texto: 'Archivo no válido' });
@@ -124,7 +130,7 @@ export default function Ajustes() {
   }
 
   const sexo = ajustes.perfil?.sexo;
-  const metaBaja = f.metaManual && sexo && bajoElPiso(limpiarNumero(f.metaKcal), sexo);
+  const metaBaja = f.metaManual && sexo && bajoElPiso(limpiarEntero(f.metaKcal), sexo);
 
   return (
     <main className="pantalla">
@@ -229,6 +235,13 @@ export default function Ajustes() {
           />
         </label>
         {avisoClave && <p className={`aviso ${avisoClave.tipo}`}>{avisoClave.texto}</p>}
+        {hayFotoEsperando && (
+          <div className="acciones" style={{ marginBottom: 10 }}>
+            <button className="primario" onClick={() => navegar(-1)}>
+              Volver a la foto
+            </button>
+          </div>
+        )}
         <button onClick={probar} disabled={probando || !f.apiKey.trim()}>
           {probando ? 'Probando…' : 'Probar clave'}
         </button>

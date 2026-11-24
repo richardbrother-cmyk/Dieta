@@ -37,7 +37,8 @@ const aFilas = (alimentos: Alimento[]): Fila[] =>
   alimentos.map((a) => ({ clave: siguienteClave++, base: a, actual: a }));
 
 export default function Revision() {
-  const entrada = useLocation().state as EntradaRevision | null;
+  const ubicacion = useLocation();
+  const entrada = ubicacion.state as EntradaRevision | null;
   const navegar = useNavigate();
   const [ajustes] = useAjustes();
 
@@ -101,6 +102,14 @@ export default function Revision() {
   const { fecha, comidaId } = entrada;
   const destino = fecha === fechaLocal() ? '/' : `/historial/${fecha}`;
 
+  /**
+   * Vuelve a la pantalla anterior sin dejar una entrada repetida en el historial del
+   * navegador. Si la revisión es la primera entrada (p. ej. tras recargar), no hay a dónde
+   * volver y se reemplaza por el día correspondiente.
+   */
+  const salir = () =>
+    ubicacion.key === 'default' ? navegar(destino, { replace: true }) : navegar(-1);
+
   const cambiarFila = (clave: number, cambio: (f: Fila) => Fila) =>
     setFilas((fs) => fs.map((f) => (f.clave === clave ? cambio(f) : f)));
 
@@ -120,7 +129,7 @@ export default function Revision() {
         nota,
         alimentos: filas.map((f) => ({ ...f.actual, nombre: f.actual.nombre.trim() || 'Alimento' })),
       });
-      navegar(destino, { replace: true });
+      salir();
     } catch {
       setErrorGuardar(true);
       enCurso.current = false;
@@ -131,7 +140,7 @@ export default function Revision() {
   async function borrar() {
     if (!comidaId || !window.confirm('¿Borrar esta comida?')) return;
     await borrarComida(comidaId);
-    navegar(destino, { replace: true });
+    salir();
   }
 
   const total = totalesDe(filas.map((f) => f.actual));
@@ -152,7 +161,9 @@ export default function Revision() {
             {error === 'clave_invalida' && (
               <>
                 {' '}
-                <Link to="/ajustes">Ir a Ajustes</Link>
+                <Link to="/ajustes" state={{ volverAFoto: true }}>
+                  Ir a Ajustes
+                </Link>
               </>
             )}
           </p>
@@ -250,7 +261,7 @@ export default function Revision() {
         >
           Guardar
         </button>
-        <button onClick={() => navegar(destino, { replace: true })}>
+        <button onClick={salir}>
           {comidaId ? 'Cancelar' : 'Descartar'}
         </button>
       </div>

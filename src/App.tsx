@@ -39,13 +39,16 @@ export default function App() {
         <Route path="/peso" element={<Peso />} />
         <Route path="/ajustes" element={<Ajustes />} />
       </Routes>
-      <nav className="pestanas" aria-label="Secciones">
-        {PESTANAS.map((p) => (
-          <NavLink key={p.a} to={p.a} end={p.a === '/'}>
-            {p.nombre}
-          </NavLink>
-        ))}
-      </nav>
+      {/* En la revisión no hay pestañas: un toque accidental descartaría la foto y lo editado. */}
+      {pathname !== '/revision' && (
+        <nav className="pestanas" aria-label="Secciones">
+          {PESTANAS.map((p) => (
+            <NavLink key={p.a} to={p.a} end={p.a === '/'}>
+              {p.nombre}
+            </NavLink>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }

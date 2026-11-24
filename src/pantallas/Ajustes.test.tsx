@@ -133,3 +133,39 @@ test('con la configuración completa, la app abre en Hoy', async () => {
   abrir('/');
   expect(screen.queryByRole('heading', { name: 'Ajustes' })).not.toBeInTheDocument();
 });
+
+test('una meta escrita con punto de miles se guarda entera', async () => {
+  const u = userEvent.setup();
+  abrir('/ajustes');
+  await llenarPerfil(u);
+  await u.click(screen.getByLabelText('Fijar meta a mano'));
+  const kcal = screen.getByLabelText('Calorías por día');
+  await u.clear(kcal);
+  await u.type(kcal, '1.800');
+  expect(leerAjustes().metaKcal).toBe(1800);
+});
+
+test('tras importar, el formulario muestra lo importado y escribir la clave no lo pisa', async () => {
+  const u = userEvent.setup();
+  guardarAjustes({
+    perfil: { sexo: 'mujer', edad: 40, estaturaCm: 160, pesoKg: 60, actividad: 'ligero' },
+    metaManual: true, metaKcal: 1650, metaProteina: 110, apiKey: 'sk-ant-vieja',
+  });
+  const { exportar } = await import('../datos/respaldo');
+  const respaldo = JSON.stringify(await exportar());
+  await borrarTodo();
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  abrir('/ajustes');
+  await u.upload(
+    screen.getByLabelText('Importar respaldo'),
+    new File([respaldo], 'r.json', { type: 'application/json' }),
+  );
+  expect(await screen.findByText('Datos importados')).toBeInTheDocument();
+  expect(screen.getByLabelText('Edad')).toHaveValue('40');
+  expect(screen.getByLabelText('Fijar meta a mano')).toBeChecked();
+  await u.type(screen.getByLabelText('Clave de API'), 'sk-ant-nueva');
+  expect(leerAjustes()).toMatchObject({
+    metaManual: true, metaKcal: 1650, metaProteina: 110, apiKey: 'sk-ant-nueva',
+  });
+  expect(leerAjustes().perfil).toMatchObject({ sexo: 'mujer', edad: 40 });
+});

@@ -8,6 +8,15 @@ export function limpiarNumero(v: unknown): number {
   return n;
 }
 
+/**
+ * Para campos de número entero (metas, edad): solo cuentan los dígitos, de modo que
+ * '1.800' y '1,800' son mil ochocientos, igual que la app los muestra.
+ */
+export function limpiarEntero(v: string): number {
+  const digitos = v.replace(/\D/g, '');
+  return digitos ? Number(digitos) : 0;
+}
+
 const unDecimal = (n: number) => Math.round(n * 10) / 10;
 
 /** Cambia los gramos y ajusta calorías y macros en la misma proporción. */

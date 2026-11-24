@@ -92,6 +92,12 @@ test('primer uso, foto, edición y borrado', async ({ page }) => {
   await expect(page.getByText('482 / 2.150 kcal')).toBeVisible();
   await expect(page.locator('.lista img.mini')).toBeVisible();
 
+  // Guardar no deja una entrada repetida en el historial del navegador: Atrás sale de Hoy.
+  await page.goBack();
+  await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
+  await page.goForward();
+  await expect(page.getByText('482 / 2.150 kcal')).toBeVisible();
+
   await page.reload();
   await expect(page.getByText('482 / 2.150 kcal')).toBeVisible();
 
