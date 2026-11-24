@@ -169,3 +169,16 @@ test('tras importar, el formulario muestra lo importado y escribir la clave no l
   });
   expect(leerAjustes().perfil).toMatchObject({ sexo: 'mujer', edad: 40 });
 });
+
+test('con la clave puesta pero sin perfil, pide solo el perfil', async () => {
+  guardarAjustes({ ...leerAjustes(), apiKey: 'sk-ant-x' });
+  abrir('/');
+  expect(await screen.findByText('Falta completar tu perfil para empezar')).toBeInTheDocument();
+});
+
+test('con el perfil puesto pero sin clave, pide solo la clave', async () => {
+  const u = userEvent.setup();
+  abrir('/ajustes');
+  await llenarPerfil(u);
+  expect(await screen.findByText('Falta tu clave de API para empezar')).toBeInTheDocument();
+});

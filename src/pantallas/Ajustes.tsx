@@ -136,7 +136,13 @@ export default function Ajustes() {
     <main className="pantalla">
       <h1>Ajustes</h1>
       {!configuracionCompleta(ajustes) && (
-        <p className="aviso atencion">Completa tu perfil y tu clave para empezar</p>
+        <p className="aviso atencion">
+          {!ajustes.perfil && !ajustes.apiKey
+            ? 'Completa tu perfil y tu clave para empezar'
+            : !ajustes.perfil
+              ? 'Falta completar tu perfil para empezar'
+              : 'Falta tu clave de API para empezar'}
+        </p>
       )}
 
       <section className="tarjeta">
