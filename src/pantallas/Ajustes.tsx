@@ -8,6 +8,7 @@ import { entero } from '../dominio/formato';
 import { bajoElPiso, PISO_KCAL } from '../dominio/metas';
 import type { Actividad, Ajustes as TipoAjustes, Perfil, Sexo } from '../dominio/tipos';
 import { MENSAJES, codigoDe, probarClave } from '../ia/analizar';
+import { estaInstalada, useInstalacion } from '../instalar';
 
 interface Formulario {
   sexo: Sexo | '';
@@ -54,6 +55,7 @@ export default function Ajustes() {
   const [avisoDatos, setAvisoDatos] = useState<Aviso>(null);
   const [probando, setProbando] = useState(false);
   const navegar = useNavigate();
+  const instalacion = useInstalacion();
   /** Se llegó aquí desde una foto que no se pudo analizar por la clave. */
   const hayFotoEsperando = !!(useLocation().state as { volverAFoto?: boolean } | null)?.volverAFoto;
 
@@ -260,6 +262,22 @@ export default function Ajustes() {
           Anthropic.
         </p>
       </section>
+
+      {!estaInstalada() && (
+        <section className="tarjeta">
+          <h2 style={{ marginTop: 0 }}>Instalar en el teléfono</h2>
+          {instalacion.disponible ? (
+            <button className="primario" onClick={instalacion.instalar}>
+              Instalar app
+            </button>
+          ) : (
+            <p className="suave">
+              En Chrome, abre el menú ⋮ y elige «Agregar a pantalla principal» o «Instalar app».
+              No aparece en ventanas de incógnito ni dentro de otras apps.
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="tarjeta">
         <h2 style={{ marginTop: 0 }}>Respaldo</h2>
