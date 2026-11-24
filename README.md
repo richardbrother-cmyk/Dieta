@@ -28,10 +28,10 @@ respaldos.
 
 ## Publicarla
 
-El repositorio trae un workflow que publica la app en GitHub Pages con cada cambio en `main`.
+El repositorio trae un workflow que compila la app y la publica en GitHub Pages con cada cambio en la rama principal. Pages debe usar ese workflow: si se elige "Deploy from a branch" se publica el código sin compilar y la página queda en blanco.
 
 1. En GitHub: **Settings → Pages → Source: GitHub Actions**.
-2. Lleva los cambios a `main`.
+2. Sube un cambio a la rama principal, o lanza el workflow a mano desde la pestaña **Actions**.
 3. La app queda en `https://<tu-usuario>.github.io/Dieta/`.
 
 La dirección es pública, pero el sitio no contiene tus datos ni tu clave.
